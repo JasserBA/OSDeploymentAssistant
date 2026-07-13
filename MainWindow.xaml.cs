@@ -10,6 +10,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Windows.Navigation; // Added for RequestNavigateEventArgs
+using OSDeploymentAssistant.Integrations; // ServiceNow integration
+using System.Windows;
+
 
 namespace OSDeploymentAssistant
 {
@@ -24,11 +27,18 @@ namespace OSDeploymentAssistant
 
     public partial class MainWindow : Window
     {
-        public ObservableCollection<TrackedTicket> MonitoredTickets { get; set; } = new ObservableCollection<TrackedTicket>();
-        private DispatcherTimer monitorTimer = new DispatcherTimer();
-        private Random rnd = new Random();
+        public ObservableCollection<TrackedTicket> MonitoredTickets { get; set; } = new();
+
+        private DispatcherTimer monitorTimer = new();
+        private Random rnd = new();
         private const int MAX_NAME_LENGTH = 14;
         private bool isRemotePCReachable = false;
+
+        // === ServiceNow integration config ===
+        // Base URL of your ServiceNow instance.
+        private static readonly ServiceNowClient _serviceNowClient = new ServiceNowClient("https://leoni.service-now.com");
+        // TODO: replace with the sys_id of your real "SCCM Asset" catalog item in sc_cat_item.
+        private const string SccmCatalogItemSysId = "PUT_YOUR_CATALOG_ITEM_SYS_ID_HERE";
 
         public MainWindow()
         {
@@ -324,7 +334,7 @@ namespace OSDeploymentAssistant
                 return;
             }
 
-            var invalidMacs = new List<string>();
+            var invalidMacs = new System.Collections.Generic.List<string>();
             foreach (string line in macLines)
             {
                 string mac = line.Trim();
@@ -349,12 +359,15 @@ namespace OSDeploymentAssistant
             {
                 basePrefix = basePrefix.Substring(0, 11);
             }
-            
+
             this.IsEnabled = false;
-            await Task.Delay(1000);
-            this.IsEnabled = true;
 
             int registeredCount = 0;
+            var failures = new System.Collections.Generic.List<string>();
+            string requestedFor = TxtUser?.Text ?? Environment.UserName;
+            string node = (ComboNode?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+            string osName = (ComboOS?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+
             foreach (string line in macLines)
             {
                 string trimmedLine = line.Trim();
@@ -362,34 +375,69 @@ namespace OSDeploymentAssistant
 
                 string numericSuffix = rnd.Next(100, 999).ToString();
                 string uniqueName = $"{basePrefix}{numericSuffix}";
-                
+
                 if (uniqueName.Length > MAX_NAME_LENGTH)
                 {
                     int prefixLength = MAX_NAME_LENGTH - numericSuffix.Length;
-                    if (prefixLength > 0)
-                    {
-                        uniqueName = $"{basePrefix.Substring(0, prefixLength)}{numericSuffix}";
-                    }
-                    else
-                    {
-                        uniqueName = numericSuffix;
-                    }
+                    uniqueName = prefixLength > 0
+                        ? $"{basePrefix.Substring(0, prefixLength)}{numericSuffix}"
+                        : numericSuffix;
                 }
-                
-                string generatedTicketNum = $"RITM{rnd.Next(1000000, 9999999)}";
-                
-                MonitoredTickets.Add(new TrackedTicket
+
+                var requestItem = new ServiceNowRequestItem
                 {
-                    TicketID = generatedTicketNum,
+                    RequestedFor = requestedFor,
+                    ShortDescription = $"SCCM asset provisioning for {uniqueName}",
+                    CatalogItemSysId = SccmCatalogItemSysId,
                     AssetName = uniqueName,
-                    Status = "Staging (OS-Install)",
-                    MinutesElapsed = 0
-                });
-                registeredCount++;
+                    MacAddress = trimmedLine,
+                    Node = node,
+                    OperatingSystem = osName
+                };
+
+                try
+                {
+                    ServiceNowTicketResult ticket = await _serviceNowClient.CreateSccmAssetRequestAsync(requestItem);
+
+                    if (string.IsNullOrWhiteSpace(ticket.Number))
+                    {
+                        // ServiceNow didn't return a real RITMxxxxxxx number - treat as a failure
+                        // rather than showing the internal sys_id as if it were the ticket name.
+                        throw new ServiceNowException(
+                            $"ServiceNow accepted the record (sys_id {ticket.SysId}) but did not return a RITM number.");
+                    }
+
+                    MonitoredTickets.Add(new TrackedTicket
+                    {
+                        TicketID = ticket.Number, // e.g. RITM0012345
+                        AssetName = uniqueName,
+                        Status = "Staging (OS-Install)",
+                        MinutesElapsed = 0
+                    });
+                    registeredCount++;
+                }
+                catch (Exception ex)
+                {
+                    failures.Add($"{trimmedLine} ({uniqueName}): {ex.Message}");
+                }
             }
 
-            MessageBox.Show($"Successfully executed asset initialization loop!\n\nProvisioned {registeredCount} target hardware profiles.\r\nAll batch tokens queued inside active monitoring view.", 
-                "Batch Provision Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            this.IsEnabled = true;
+
+            if (failures.Any())
+            {
+                string failureList = string.Join(Environment.NewLine, failures.Take(5));
+                string extra = failures.Count > 5 ? $"{Environment.NewLine}... and {failures.Count - 5} more" : "";
+                MessageBox.Show(
+                    $"Created {registeredCount} ServiceNow ticket(s).\n\n{failures.Count} request(s) failed:\n{failureList}{extra}",
+                    "Partial Failure", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                MessageBox.Show(
+                    $"Successfully created {registeredCount} ServiceNow ticket(s) for SCCM asset provisioning!\r\nAll tickets queued inside the active monitoring view.",
+                    "Batch Provision Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void TxtMac_TextChanged(object sender, TextChangedEventArgs e)
@@ -404,7 +452,7 @@ namespace OSDeploymentAssistant
                 string originalText = TxtMac.Text;
                 
                 string[] lines = originalText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                var resultLines = new List<string>();
+                var resultLines = new System.Collections.Generic.List<string>();
 
                 foreach (string line in lines)
                 {
