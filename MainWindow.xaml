@@ -584,7 +584,7 @@
                         <StackPanel>
                             <TextBlock Text="AUTOMATION OPTIONS" Style="{StaticResource EyebrowText}" Margin="0,0,0,12"/>
 
-                            <CheckBox x:Name="ChkFirewall" Content="Open ICMPv4 (allow ping)" IsChecked="True" Margin="0,0,0,12" Cursor="Hand"/>
+                            <CheckBox x:Name="ChkFirewall" Content="Add All-Ports ICMPv4 (Especially Win 11 LTSC)" IsChecked="True" Margin="0,0,0,12" Cursor="Hand"/>
                             <CheckBox x:Name="ChkTimezone" Content="Set timezone: W. Central Africa Standard Time" IsChecked="True" Margin="0,0,0,12" Cursor="Hand"/>
                             <CheckBox x:Name="ChkKeyboard" Content="Set keyboard layout: French (fr-FR)" IsChecked="True" Margin="0,0,0,12" Cursor="Hand"/>
                             <CheckBox x:Name="ChkRegistryFix" Content="Apply Windows Update registry fix" IsChecked="False" Margin="0,0,0,12" Cursor="Hand"/>
