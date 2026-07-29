@@ -54,48 +54,50 @@
             <Setter Property="Padding" Value="18,16"/>
         </Style>
 
-        <!-- ===================== TEXTBOX ===================== -->
-        <Style TargetType="TextBox">
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="{StaticResource BgSurfaceAlt}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderLine}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="CaretBrush" Value="{StaticResource AccentCyan}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="9"
-                                SnapsToDevicePixels="True">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          Focusable="false"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#39424F"/>
-                            </Trigger>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentCyan}"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Background" Value="#0F1219"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextFaint}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+<!-- ===================== TEXTBOX ===================== -->
+<Style TargetType="TextBox">
+    <Setter Property="Height" Value="38"/>
+    <Setter Property="Padding" Value="12,0"/>
+    <Setter Property="VerticalContentAlignment" Value="Center"/>
+    <Setter Property="Background" Value="{StaticResource BgSurfaceAlt}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource BorderLine}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    <Setter Property="CaretBrush" Value="{StaticResource AccentCyan}"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="TextBox">
+                <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="9"
+                        SnapsToDevicePixels="True">
+                    <ScrollViewer x:Name="PART_ContentHost"
+                                  Margin="{TemplateBinding Padding}"
+                                  Focusable="false"
+                                  HorizontalScrollBarVisibility="Hidden"
+                                  VerticalScrollBarVisibility="Hidden"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="border" Property="BorderBrush" Value="#39424F"/>
+                    </Trigger>
+                    <Trigger Property="IsFocused" Value="True">
+                        <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentCyan}"/>
+                        <Setter TargetName="border" Property="Background" Value="{StaticResource BgSurfaceAlt}"/>
+                    </Trigger>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter TargetName="border" Property="Background" Value="{StaticResource BgSurfaceAlt}"/>
+                        <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BorderLine}"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+                        <Setter Property="Opacity" Value="0.7"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
         <!-- ===================== COMBOBOXITEM ===================== -->
         <Style TargetType="ComboBoxItem">
             <Setter Property="Height" Value="34"/>
@@ -396,7 +398,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+<Style TargetType="FrameworkElement">
+    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+</Style>
     </Window.Resources>
 
     <Grid Background="{StaticResource BgBase}">

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OSDeploymentAssistant")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c10ba1a814f3285d8cba98d60a8c580050ada4b4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+861f59edbdb0d49e10d36d1371eea95c114688b3")]
 [assembly: System.Reflection.AssemblyProductAttribute("OSDeploymentAssistant")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OSDeploymentAssistant")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

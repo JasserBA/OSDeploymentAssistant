@@ -508,40 +508,41 @@ namespace OSDeploymentAssistant
             }
         }
 
-        private void RdoLocal_Checked(object sender, RoutedEventArgs e)
-        {
-            if (PanelRemote != null && TxtRemotePC != null)
-            {
-                PanelRemote.IsEnabled = false;
-                TxtRemotePC.IsEnabled = false;
-                TxtRemotePC.Background = System.Windows.Media.Brushes.LightGray;
-                TxtRemotePC.Text = "";
-                
-                if (BtnPing != null) BtnPing.IsEnabled = false;
-                ResetPingStatus();
-                isRemotePCReachable = false;
-                UpdateExecuteButtonState();
-            }
-            UpdateAutomationStatus("Local machine selected");
-        }
+       private void RdoLocal_Checked(object sender, RoutedEventArgs e)
+{
+    if (PanelRemote != null && TxtRemotePC != null)
+    {
+        PanelRemote.IsEnabled = false;
+        TxtRemotePC.IsEnabled = false;
+        // REMOVE THIS LINE: TxtRemotePC.Background = System.Windows.Media.Brushes.LightGray;
+        TxtRemotePC.Text = "";
+        
+        if (BtnPing != null) BtnPing.IsEnabled = false;
+        ResetPingStatus();
+        isRemotePCReachable = false;
+        UpdateExecuteButtonState();
+    }
+    UpdateAutomationStatus("Local machine selected");
+}
 
-        private void RdoRemote_Checked(object sender, RoutedEventArgs e)
-        {
-            if (PanelRemote != null && TxtRemotePC != null)
-            {
-                PanelRemote.IsEnabled = true;
-                TxtRemotePC.IsEnabled = true;
-                TxtRemotePC.Background = System.Windows.Media.Brushes.White;
-                TxtRemotePC.Focus();
-                
-                if (BtnPing != null) BtnPing.IsEnabled = true;
-                ResetPingStatus();
-                isRemotePCReachable = false;
-                UpdateExecuteButtonState();
-            }
-            UpdateAutomationStatus("Remote PC selected - Enter computer name and test connectivity");
-        }
+private void RdoRemote_Checked(object sender, RoutedEventArgs e)
+{
+    if (PanelRemote != null && TxtRemotePC != null)
+    {
+        PanelRemote.IsEnabled = true;
+        TxtRemotePC.IsEnabled = true;
+        // REMOVE THIS LINE: TxtRemotePC.Background = System.Windows.Media.Brushes.White;
+        TxtRemotePC.Focus();
+        
+        if (BtnPing != null) BtnPing.IsEnabled = true;
+        ResetPingStatus();
+        isRemotePCReachable = false;
+        UpdateExecuteButtonState();
+    }
+    UpdateAutomationStatus("Remote PC selected - Enter computer name and test connectivity");
+}
 
+      
         private async void BtnPing_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtRemotePC?.Text))
@@ -649,39 +650,33 @@ namespace OSDeploymentAssistant
             }
         }
 
-        private void UpdatePingStatus(string statusText, string colorHex, bool isSuccess)
-        {
-            if (PingStatusText != null)
-            {
-                PingStatusText.Text = statusText;
-                PingStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
-                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorHex));
-            }
-            
-            if (PingIndicator != null)
-            {
-                PingIndicator.Fill = new System.Windows.Media.SolidColorBrush(
-                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorHex));
-            }
-            
-            if (PingStatus != null)
-            {
-                if (isSuccess)
-                {
-                    PingStatus.BorderBrush = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10B981"));
-                    PingStatus.Background = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ECFDF5"));
-                }
-                else
-                {
-                    PingStatus.BorderBrush = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#E2E8F0"));
-                    PingStatus.Background = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F1F5F9"));
-                }
-            }
-        }
+   private void UpdatePingStatus(string statusText, string colorHex, bool isSuccess)
+{
+    if (PingStatusText != null)
+    {
+        PingStatusText.Text = statusText;
+        PingStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorHex));
+    }
+    
+    if (PingIndicator != null)
+    {
+        PingIndicator.Fill = new System.Windows.Media.SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorHex));
+    }
+    
+    // Keep dark theme background, only change border color based on status
+    if (PingStatus != null)
+    {
+        // Don't change the background - keep it dark from XAML
+        // Only update the border brush to indicate status
+        PingStatus.BorderBrush = new System.Windows.Media.SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colorHex));
+        
+        // Optionally change border thickness for better visibility
+        PingStatus.BorderThickness = new Thickness(2);
+    }
+}
 
         private void ResetPingStatus()
         {
